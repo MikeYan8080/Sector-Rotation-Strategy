@@ -143,3 +143,43 @@ for i, x in enumerate([a, b, c, d]):
         x.to_excel(writer, sheet_name=str(i))
 
 page.render(r'Results.html')
+
+
+# sensitivity analysis
+table2 = pd.DataFrame(measure(spyR),
+                     index=['Average Return', 'Sharp Ratio', 'Alpha', 'M-Measure'],
+                     columns=['SPY-Bench Mark'])
+
+table3 = pd.DataFrame(measure(spyR),
+                     index=['Average Return', 'Sharp Ratio', 'Alpha', 'M-Measure'],
+                     columns=['SPY-Bench Mark'])
+
+for n in range(8, 24):
+    m = str(n)
+    table2[m] = measure(rotation(data4, numetf=n, num=2, ascend=True, fee=True))
+
+for n in range(8, 24):
+    m = str(n)
+    table3[m] = measure(rotation(data44, numetf=n, num=3, ascend=True, fee=True))
+
+# with pd.ExcelWriter(r'C:\Users\严书航\Desktop\Results.xlsx', mode='a') as writer:
+#          table2.to_excel(writer, sheet_name='method 2')
+#          table3.to_excel(writer, sheet_name='method 4')
+
+# calculate utility
+
+return_method4 = rotation(data44, numetf=10, num=3, ascend=True, fee=True)
+
+
+def utility(returns, Ra=6):
+    u = np.mean(returns)*100 - 0.005*Ra*np.var(returns, ddof=1)*10000
+
+    return u
+
+
+u_spy = utility(spyRD)
+u_m4 = utility(return_method4)
+
+print(u_m4)
+print(u_spy)
+print(utility(rotation(data4, numetf=10, num=2, ascend=False, fee=True)))
